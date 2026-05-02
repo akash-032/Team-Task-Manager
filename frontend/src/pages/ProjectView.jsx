@@ -47,7 +47,11 @@ const ProjectView = () => {
   const handleCreateTask = async (e) => {
     e.preventDefault();
     try {
-      const { data } = await api.post('/tasks', { ...taskData, project: id });
+      const payload = { ...taskData, project: id };
+      if (!payload.assignedTo) {
+        delete payload.assignedTo;
+      }
+      const { data } = await api.post('/tasks', payload);
       setTasks([...tasks, data]);
       setShowCreateTask(false);
       setTaskData({ title: '', description: '', assignedTo: '', status: 'Pending' });

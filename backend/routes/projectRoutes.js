@@ -39,7 +39,8 @@ router.post('/', protect, admin, async (req, res) => {
 router.put('/:id/members', protect, admin, async (req, res) => {
   try {
     const { email } = req.body;
-    const user = await User.findOne({ email });
+    // Find user case-insensitively
+    const user = await User.findOne({ email: { $regex: new RegExp(`^${email}$`, 'i') } });
     if (!user) return res.status(404).json({ message: 'User not found' });
 
     const project = await Project.findById(req.params.id);
@@ -49,7 +50,8 @@ router.put('/:id/members', protect, admin, async (req, res) => {
       return res.status(403).json({ message: 'Not authorized to modify this project' });
     }
 
-    if (!project.members.includes(user._id)) {
+    // Check if member already exists using .some and .toString()
+    if (!project.members.some(memberId => memberId.toString() === user._id.toString())) {
       project.members.push(user._id);
       await project.save();
     }
