@@ -40,7 +40,7 @@ const ProjectView = () => {
       const { data } = await api.get(`/projects/${id}`);
       setProject(data);
     } catch (error) {
-      alert('Failed to add member. Check email.');
+      alert(error.response?.data?.message || 'Failed to add member.');
     }
   };
 

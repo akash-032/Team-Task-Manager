@@ -39,9 +39,10 @@ router.post('/', protect, admin, async (req, res) => {
 router.put('/:id/members', protect, admin, async (req, res) => {
   try {
     const { email } = req.body;
-    // Find user case-insensitively
-    const user = await User.findOne({ email: { $regex: new RegExp(`^${email}$`, 'i') } });
-    if (!user) return res.status(404).json({ message: 'User not found' });
+    // Find user case-insensitively and trim spaces
+    const trimmedEmail = email.trim();
+    const user = await User.findOne({ email: new RegExp(`^${trimmedEmail}$`, 'i') });
+    if (!user) return res.status(404).json({ message: 'User not found. They need to sign up first.' });
 
     const project = await Project.findById(req.params.id);
     if (!project) return res.status(404).json({ message: 'Project not found' });
